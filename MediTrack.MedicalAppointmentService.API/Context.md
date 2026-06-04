@@ -31,4 +31,8 @@ MedicalAppointmentManagement/
 
 ## Database
 
-- `medical_appointment_db` on MySQL.
+- Connection name: `AppoinmentDB`
+- Hostname: `127.0.0.1`
+- Port: `3306`
+- Username: `root`
+- Database: `AppoinmentDB`
