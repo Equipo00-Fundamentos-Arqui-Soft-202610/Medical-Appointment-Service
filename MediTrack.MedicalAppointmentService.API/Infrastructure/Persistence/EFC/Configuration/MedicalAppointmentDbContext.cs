@@ -1,0 +1,126 @@
+using MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates;
+using MediTrack.MedicalAppointmentService.API.Domain.Model.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+
+namespace MediTrack.MedicalAppointmentService.API.Infrastructure.Persistence.EFC.Configuration;
+
+public class MedicalAppointmentDbContext : DbContext
+{
+    public MedicalAppointmentDbContext(DbContextOptions<MedicalAppointmentDbContext> options)
+        : base(options) { }
+
+    public DbSet<MedicalAppointment> MedicalAppointments { get; set; } = null!;
+    public DbSet<AppointmentRequirement> AppointmentRequirements { get; set; } = null!;
+    public DbSet<ClinicalExam> ClinicalExams { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<MedicalAppointment>(entity =>
+        {
+            entity.ToTable("medical_appointment");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.PatientId)
+                .HasColumnName("patient_id")
+                .IsRequired();
+
+            entity.Property(e => e.Type)
+                .HasColumnName("type")
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasConversion(v => v.Value, v => AppointmentType.From(v));
+
+            entity.Property(e => e.ScheduledAt)
+                .HasColumnName("scheduled_at")
+                .IsRequired();
+
+            entity.Property(e => e.Location)
+                .HasColumnName("location")
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasConversion(v => v.Value, v => AppointmentStatus.From(v));
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.HasMany(e => e.Requirements)
+                .WithOne(r => r.MedicalAppointment)
+                .HasForeignKey(r => r.MedicalAppointmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AppointmentRequirement>(entity =>
+        {
+            entity.ToTable("appointment_requirement");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.MedicalAppointmentId)
+                .HasColumnName("medical_appointment_id")
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(500)
+                .IsRequired()
+                .HasConversion(v => v.Value, v => new RequirementText(v));
+        });
+
+        modelBuilder.Entity<ClinicalExam>(entity =>
+        {
+            entity.ToTable("clinical_exam");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.PatientId)
+                .HasColumnName("patient_id")
+                .IsRequired();
+
+            entity.Property(e => e.ExamType)
+                .HasColumnName("exam_type")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.PickupDate)
+                .HasColumnName("pickup_date")
+                .IsRequired();
+
+            entity.Property(e => e.LaboratoryName)
+                .HasColumnName("laboratory_name")
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasConversion(v => v.Value, v => ClinicalExamStatus.From(v));
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+        });
+    }
+}
