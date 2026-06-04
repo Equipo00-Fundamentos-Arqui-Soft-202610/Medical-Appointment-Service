@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MediTrack.MedicalAppointmentService.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df2ec57654737146656adce20101990c26917f34")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a454ec5b23f78035b1d541dabea59b5f2ff378d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("MediTrack.MedicalAppointmentService.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MediTrack.MedicalAppointmentService.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
