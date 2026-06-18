@@ -1,6 +1,7 @@
 using MediTrack.MedicalAppointmentService.API.Application.Internal.CommandServices;
 using MediTrack.MedicalAppointmentService.API.Application.Internal.QueryServices;
 using MediTrack.MedicalAppointmentService.API.Domain.Model;
+using MediTrack.MedicalAppointmentService.API.Infrastructure.Messaging;
 using MediTrack.MedicalAppointmentService.API.Infrastructure.Persistence.EFC;
 using MediTrack.MedicalAppointmentService.API.Infrastructure.Persistence.EFC.Configuration;
 using MediTrack.MedicalAppointmentService.API.Interfaces.REST.Transform;
@@ -22,6 +23,8 @@ builder.Services.AddScoped<IMedicalAppointmentCommandService, MedicalAppointment
 builder.Services.AddScoped<IMedicalAppointmentQueryService, MedicalAppointmentQueryService>();
 builder.Services.AddScoped<IClinicalExamCommandService, ClinicalExamCommandService>();
 builder.Services.AddScoped<IClinicalExamQueryService, ClinicalExamQueryService>();
+
+builder.Services.AddSingleton<IEventPublisher, RabbitMqPublisher>();
 
 builder.Services.AddScoped<AppointmentCommandFromResourceAssembler>();
 builder.Services.AddScoped<MedicalAppointmentResourceFromEntityAssembler>();

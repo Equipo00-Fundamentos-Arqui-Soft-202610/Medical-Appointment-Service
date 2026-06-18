@@ -1,16 +1,25 @@
+using MediTrack.MedicalAppointmentService.API.Application.OutboundEvents;
 using MediTrack.MedicalAppointmentService.API.Domain.Model;
 using MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates;
 using MediTrack.MedicalAppointmentService.API.Domain.Model.Commands;
+using MediTrack.MedicalAppointmentService.API.Infrastructure.Messaging;
 
 namespace MediTrack.MedicalAppointmentService.API.Application.Internal.CommandServices;
 
 public class MedicalAppointmentCommandService : IMedicalAppointmentCommandService
 {
     private readonly IMedicalAppointmentRepository _appointmentRepository;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly ILogger<MedicalAppointmentCommandService> _logger;
 
-    public MedicalAppointmentCommandService(IMedicalAppointmentRepository appointmentRepository)
+    public MedicalAppointmentCommandService(
+        IMedicalAppointmentRepository appointmentRepository,
+        IEventPublisher eventPublisher,
+        ILogger<MedicalAppointmentCommandService> logger)
     {
         _appointmentRepository = appointmentRepository;
+        _eventPublisher = eventPublisher;
+        _logger = logger;
     }
 
     public async Task<MedicalAppointment> HandleAsync(ScheduleAppointmentCommand command)
@@ -61,6 +70,26 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
         appointment.RegisterAttendance(command.Status);
 
         await _appointmentRepository.UpdateAsync(appointment);
+
+        try
+        {
+            await _eventPublisher.PublishAsync("AppointmentAttendanceRegistered",
+                new AppointmentAttendanceRegisteredEvent
+                {
+                    PatientId = appointment.PatientId,
+                    AppointmentId = appointment.Id,
+                    AttendanceStatus = command.Status,
+                    OccurredAt = DateTime.UtcNow
+                });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to publish appointment attendance registered event for appointment {AppointmentId}",
+                appointment.Id);
+        }
+
         return appointment;
     }
 }
