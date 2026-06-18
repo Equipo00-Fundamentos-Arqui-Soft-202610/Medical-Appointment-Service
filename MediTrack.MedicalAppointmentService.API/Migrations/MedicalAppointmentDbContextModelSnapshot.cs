@@ -34,13 +34,13 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
 
                     b.Property<int>("MedicalAppointmentId")
                         .HasColumnType("int")
-                        .HasColumnName("medical_appointment_id");
+                        .HasColumnName("appointment_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MedicalAppointmentId");
 
-                    b.ToTable("appointment_requirement", (string)null);
+                    b.ToTable("appointment_requirements", (string)null);
                 });
 
             modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.ClinicalExam", b =>
@@ -50,42 +50,39 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("appointment_id");
 
                     b.Property<string>("ExamType")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("exam_type");
-
-                    b.Property<string>("LaboratoryName")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("laboratory_name");
 
                     b.Property<int>("PatientId")
                         .HasColumnType("int")
                         .HasColumnName("patient_id");
 
-                    b.Property<DateTime>("PickupDate")
+                    b.Property<DateTime?>("PickupDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("pickup_date");
 
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("scheduled_date");
+
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
-                    b.ToTable("clinical_exam", (string)null);
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("clinical_exams", (string)null);
                 });
 
             modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.MedicalAppointment", b =>
@@ -104,13 +101,18 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("location");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)")
+                        .HasColumnName("notes");
+
                     b.Property<int>("PatientId")
                         .HasColumnType("int")
                         .HasColumnName("patient_id");
 
                     b.Property<DateTime>("ScheduledAt")
                         .HasColumnType("datetime(6)")
-                        .HasColumnName("scheduled_at");
+                        .HasColumnName("appointment_date");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -130,7 +132,7 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("medical_appointment", (string)null);
+                    b.ToTable("appointments", (string)null);
                 });
 
             modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.AppointmentRequirement", b =>
@@ -142,6 +144,16 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
                         .IsRequired();
 
                     b.Navigation("MedicalAppointment");
+                });
+
+            modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.ClinicalExam", b =>
+                {
+                    b.HasOne("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.MedicalAppointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates.MedicalAppointment", b =>
