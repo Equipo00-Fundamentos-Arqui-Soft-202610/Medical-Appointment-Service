@@ -2,15 +2,15 @@ namespace MediTrack.MedicalAppointmentService.API.Domain.Model.ValueObjects;
 
 public class ClinicalExamStatus
 {
-    public static readonly ClinicalExamStatus PendingPickup = new("pending_pickup");
-    public static readonly ClinicalExamStatus PickedUp = new("picked_up");
-    public static readonly ClinicalExamStatus Cancelled = new("cancelled");
+    public static readonly ClinicalExamStatus Pending = new("pending");
+    public static readonly ClinicalExamStatus Ready = new("ready");
+    public static readonly ClinicalExamStatus Collected = new("collected");
 
     private static readonly Dictionary<string, ClinicalExamStatus> ValidStatuses = new()
     {
-        { "pending_pickup", PendingPickup },
-        { "picked_up", PickedUp },
-        { "cancelled", Cancelled }
+        { "pending", Pending },
+        { "ready", Ready },
+        { "collected", Collected }
     };
 
     public string Value { get; }
@@ -26,13 +26,18 @@ public class ClinicalExamStatus
             throw new ArgumentException("ClinicalExamStatus cannot be empty or null", nameof(value));
 
         var normalizedValue = value.Trim().ToLowerInvariant();
+
         if (!ValidStatuses.TryGetValue(normalizedValue, out var status))
-            throw new ArgumentException("ClinicalExamStatus must be pending_pickup, picked_up, or cancelled", nameof(value));
+            throw new ArgumentException(
+                "ClinicalExamStatus must be pending, ready, or collected",
+                nameof(value));
 
         return status;
     }
 
-    public bool IsPendingPickup => Value == PendingPickup.Value;
+    public bool IsPending => Value == Pending.Value;
+    public bool IsReady => Value == Ready.Value;
+    public bool IsCollected => Value == Collected.Value;
 
     public override bool Equals(object? obj)
     {

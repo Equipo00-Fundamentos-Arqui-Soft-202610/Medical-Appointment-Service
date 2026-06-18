@@ -18,8 +18,9 @@ public class ClinicalExamCommandService : IClinicalExamCommandService
         var clinicalExam = new ClinicalExam(
             patientId: command.PatientId,
             examType: command.ExamType,
+            scheduledDate: command.ScheduledDate,
             pickupDate: command.PickupDate,
-            laboratoryName: command.LaboratoryName);
+            appointmentId: command.AppointmentId);
 
         await _clinicalExamRepository.AddAsync(clinicalExam);
         return clinicalExam;
@@ -31,7 +32,7 @@ public class ClinicalExamCommandService : IClinicalExamCommandService
         if (clinicalExam == null)
             throw new ArgumentException($"Clinical exam with id {command.ClinicalExamId} not found");
 
-        clinicalExam.MarkAsPickedUp();
+        clinicalExam.MarkAsCollected();
 
         await _clinicalExamRepository.UpdateAsync(clinicalExam);
         return clinicalExam;

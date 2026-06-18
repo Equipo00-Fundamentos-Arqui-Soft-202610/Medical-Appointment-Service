@@ -12,6 +12,7 @@ public class AppointmentCommandFromResourceAssembler
             Type: resource.Type,
             ScheduledAt: resource.ScheduledAt,
             Location: resource.Location,
+            Notes: resource.Notes,
             Requirements: resource.Requirements);
     }
 
@@ -22,6 +23,7 @@ public class AppointmentCommandFromResourceAssembler
             Type: resource.Type,
             ScheduledAt: resource.ScheduledAt,
             Location: resource.Location,
+            Notes: resource.Notes,
             Requirements: resource.Requirements);
     }
 

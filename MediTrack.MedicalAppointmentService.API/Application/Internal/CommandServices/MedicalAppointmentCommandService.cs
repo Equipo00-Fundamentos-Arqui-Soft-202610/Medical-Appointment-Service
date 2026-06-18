@@ -28,7 +28,7 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
             patientId: command.PatientId,
             type: command.Type,
             scheduledAt: command.ScheduledAt,
-            location: command.Location);
+            location: command.Location, notes: command.Notes);
 
         appointment.ReplaceRequirements(command.Requirements);
 
@@ -42,7 +42,7 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
         if (appointment == null)
             throw new ArgumentException($"Appointment with id {command.AppointmentId} not found");
 
-        appointment.Reschedule(command.Type, command.ScheduledAt, command.Location);
+        appointment.Reschedule(command.Type, command.ScheduledAt, command.Location, command.Notes);
         appointment.ReplaceRequirements(command.Requirements);
 
         await _appointmentRepository.UpdateAsync(appointment);
@@ -67,7 +67,7 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
         if (appointment == null)
             throw new ArgumentException($"Appointment with id {command.AppointmentId} not found");
 
-        appointment.RegisterAttendance(command.Status);
+        appointment.Complete();
 
         await _appointmentRepository.UpdateAsync(appointment);
 

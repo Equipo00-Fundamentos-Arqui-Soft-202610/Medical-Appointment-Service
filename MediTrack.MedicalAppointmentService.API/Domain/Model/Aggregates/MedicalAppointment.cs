@@ -9,6 +9,7 @@ public class MedicalAppointment
     public AppointmentType Type { get; set; } = null!;
     public DateTime ScheduledAt { get; set; }
     public string? Location { get; set; }
+    public string? Notes { get; set; }
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
@@ -16,7 +17,7 @@ public class MedicalAppointment
 
     public MedicalAppointment() { }
 
-    public MedicalAppointment(int patientId, string type, DateTime scheduledAt, string? location = null)
+    public MedicalAppointment(int patientId, string type, DateTime scheduledAt, string? location = null, string? notes = null)
     {
         if (patientId <= 0)
             throw new ArgumentException("PatientId must be greater than 0", nameof(patientId));
@@ -27,6 +28,7 @@ public class MedicalAppointment
         Type = AppointmentType.From(type);
         ScheduledAt = scheduledAt;
         Location = string.IsNullOrWhiteSpace(location) ? null : location.Trim();
+        Notes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
         Status = AppointmentStatus.Scheduled;
         CreatedAt = DateTime.UtcNow;
     }
@@ -34,7 +36,7 @@ public class MedicalAppointment
     public bool IsPast => ScheduledAt <= DateTime.UtcNow;
     public bool CanBeModified => !IsPast && Status.IsScheduled;
 
-    public void Reschedule(string type, DateTime scheduledAt, string? location)
+    public void Reschedule(string type, DateTime scheduledAt, string? location,string? notes)
     {
         EnsureCanBeModified();
         ValidateFutureDate(scheduledAt);
@@ -42,6 +44,7 @@ public class MedicalAppointment
         Type = AppointmentType.From(type);
         ScheduledAt = scheduledAt;
         Location = string.IsNullOrWhiteSpace(location) ? null : location.Trim();
+        Notes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -52,16 +55,12 @@ public class MedicalAppointment
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void RegisterAttendance(string attendanceStatus)
+    public void Complete()
     {
-        if (ScheduledAt.Date > DateTime.UtcNow.Date)
-            throw new ArgumentException("Cannot register attendance for a future appointment");
+        if (Status.IsCancelled)
+            throw new ArgumentException("Cannot complete a cancelled appointment");
 
-        var status = AppointmentStatus.From(attendanceStatus);
-        if (status.Value != AppointmentStatus.Attended.Value && status.Value != AppointmentStatus.Missed.Value)
-            throw new ArgumentException("Attendance status must be attended or missed", nameof(attendanceStatus));
-
-        Status = status;
+        Status = AppointmentStatus.Completed;
         UpdatedAt = DateTime.UtcNow;
     }
 
