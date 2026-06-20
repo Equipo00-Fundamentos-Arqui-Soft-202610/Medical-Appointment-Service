@@ -33,6 +33,26 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
         appointment.ReplaceRequirements(command.Requirements);
 
         await _appointmentRepository.AddAsync(appointment);
+
+        try
+        {
+            await _eventPublisher.PublishAsync("CitaAgendada",
+                new AppointmentScheduledEvent
+                {
+                    PatientId = appointment.PatientId,
+                    AppointmentId = appointment.Id,
+                    AppointmentType = appointment.Type.Value,
+                    Location = appointment.Location,
+                    AppointmentDateUtc = appointment.ScheduledAt
+                });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to publish CitaAgendada event for appointment {AppointmentId}",
+                appointment.Id);
+        }
+
         return appointment;
     }
 
