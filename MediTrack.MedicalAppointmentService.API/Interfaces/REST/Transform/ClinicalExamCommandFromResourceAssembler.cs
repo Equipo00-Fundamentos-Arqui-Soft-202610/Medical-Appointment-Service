@@ -9,8 +9,9 @@ public class ClinicalExamCommandFromResourceAssembler
     {
         return new CreateClinicalExamCommand(
             PatientId: resource.PatientId,
+            AppointmentId: resource.AppointmentId,
             ExamType: resource.ExamType,
-            PickupDate: resource.PickupDate,
-            LaboratoryName: resource.LaboratoryName);
+            ScheduledDate: resource.ScheduledDate,
+            PickupDate: resource.PickupDate);
     }
 }

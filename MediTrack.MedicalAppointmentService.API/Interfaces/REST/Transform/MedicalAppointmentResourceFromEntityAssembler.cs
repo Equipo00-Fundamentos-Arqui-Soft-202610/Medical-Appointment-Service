@@ -13,6 +13,7 @@ public class MedicalAppointmentResourceFromEntityAssembler
             Type: appointment.Type.Value,
             ScheduledAt: appointment.ScheduledAt,
             Location: appointment.Location,
+            Notes: appointment.Notes,
             Status: appointment.Status.Value,
             CanBeModified: appointment.CanBeModified,
             CreatedAt: appointment.CreatedAt,

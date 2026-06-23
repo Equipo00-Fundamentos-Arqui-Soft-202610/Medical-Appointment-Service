@@ -10,12 +10,11 @@ public class ClinicalExamResourceFromEntityAssembler
         return new ClinicalExamResource(
             Id: clinicalExam.Id,
             PatientId: clinicalExam.PatientId,
+            AppointmentId: clinicalExam.AppointmentId,
             ExamType: clinicalExam.ExamType,
+            ScheduledDate: clinicalExam.ScheduledDate,
             PickupDate: clinicalExam.PickupDate,
-            LaboratoryName: clinicalExam.LaboratoryName,
-            Status: clinicalExam.Status.Value,
-            CreatedAt: clinicalExam.CreatedAt,
-            UpdatedAt: clinicalExam.UpdatedAt);
+            Status: clinicalExam.Status.Value);
     }
 
     public ICollection<ClinicalExamResource> ToResources(ICollection<ClinicalExam> clinicalExams)

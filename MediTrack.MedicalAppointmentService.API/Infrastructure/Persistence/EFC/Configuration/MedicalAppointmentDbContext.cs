@@ -19,7 +19,7 @@ public class MedicalAppointmentDbContext : DbContext
 
         modelBuilder.Entity<MedicalAppointment>(entity =>
         {
-            entity.ToTable("medical_appointment");
+            entity.ToTable("appointments");
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -37,12 +37,16 @@ public class MedicalAppointmentDbContext : DbContext
                 .HasConversion(v => v.Value, v => AppointmentType.From(v));
 
             entity.Property(e => e.ScheduledAt)
-                .HasColumnName("scheduled_at")
+                .HasColumnName("appointment_date")
                 .IsRequired();
 
             entity.Property(e => e.Location)
                 .HasColumnName("location")
                 .HasMaxLength(255);
+            
+            entity.Property(e => e.Notes)
+                .HasColumnName("notes")
+                .HasMaxLength(400);
 
             entity.Property(e => e.Status)
                 .HasColumnName("status")
@@ -65,7 +69,7 @@ public class MedicalAppointmentDbContext : DbContext
 
         modelBuilder.Entity<AppointmentRequirement>(entity =>
         {
-            entity.ToTable("appointment_requirement");
+            entity.ToTable("appointment_requirements");
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -73,7 +77,7 @@ public class MedicalAppointmentDbContext : DbContext
                 .ValueGeneratedOnAdd();
 
             entity.Property(e => e.MedicalAppointmentId)
-                .HasColumnName("medical_appointment_id")
+                .HasColumnName("appointment_id")
                 .IsRequired();
 
             entity.Property(e => e.Description)
@@ -85,7 +89,7 @@ public class MedicalAppointmentDbContext : DbContext
 
         modelBuilder.Entity<ClinicalExam>(entity =>
         {
-            entity.ToTable("clinical_exam");
+            entity.ToTable("clinical_exams");
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -96,31 +100,30 @@ public class MedicalAppointmentDbContext : DbContext
                 .HasColumnName("patient_id")
                 .IsRequired();
 
+            entity.Property(e => e.AppointmentId)
+                .HasColumnName("appointment_id");
+
             entity.Property(e => e.ExamType)
                 .HasColumnName("exam_type")
-                .HasMaxLength(255)
+                .HasMaxLength(100)
                 .IsRequired();
+
+            entity.Property(e => e.ScheduledDate)
+                .HasColumnName("scheduled_date");
 
             entity.Property(e => e.PickupDate)
-                .HasColumnName("pickup_date")
-                .IsRequired();
-
-            entity.Property(e => e.LaboratoryName)
-                .HasColumnName("laboratory_name")
-                .HasMaxLength(255);
+                .HasColumnName("pickup_date");
 
             entity.Property(e => e.Status)
                 .HasColumnName("status")
-                .HasMaxLength(50)
+                .HasMaxLength(20)
                 .IsRequired()
                 .HasConversion(v => v.Value, v => ClinicalExamStatus.From(v));
 
-            entity.Property(e => e.CreatedAt)
-                .HasColumnName("created_at")
-                .IsRequired();
-
-            entity.Property(e => e.UpdatedAt)
-                .HasColumnName("updated_at");
+            entity.HasOne(e => e.Appointment)
+                .WithMany()
+                .HasForeignKey(e => e.AppointmentId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

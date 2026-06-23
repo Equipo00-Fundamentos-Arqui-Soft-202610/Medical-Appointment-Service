@@ -5,12 +5,14 @@ public record ScheduleAppointmentResource(
     string Type,
     DateTime ScheduledAt,
     string? Location,
+    string? Notes,
     ICollection<string>? Requirements);
 
 public record UpdateAppointmentResource(
     string Type,
     DateTime ScheduledAt,
     string? Location,
+    string? Notes,
     ICollection<string>? Requirements);
 
 public record RegisterAppointmentAttendanceResource(string Status);
@@ -25,6 +27,7 @@ public record MedicalAppointmentResource(
     string Type,
     DateTime ScheduledAt,
     string? Location,
+    string? Notes,
     string Status,
     bool CanBeModified,
     DateTime CreatedAt,

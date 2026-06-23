@@ -5,4 +5,5 @@ public record ScheduleAppointmentCommand(
     string Type,
     DateTime ScheduledAt,
     string? Location,
+    string? Notes,
     ICollection<string>? Requirements);
