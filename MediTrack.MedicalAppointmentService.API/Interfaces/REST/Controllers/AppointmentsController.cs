@@ -76,7 +76,7 @@ public class AppointmentsController : ControllerBase
                 new GetAppointmentsByPatientIdQuery(patientId));
 
             if (!appointments.Any())
-                return NotFound(new { message = $"No appointments found for patient {patientId}" });
+                return Ok(new List<MedicalAppointmentResource>());
 
             return Ok(_resourceAssembler.ToResources(appointments));
         }
@@ -85,6 +85,25 @@ public class AppointmentsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+    
+    [HttpGet("patient/{patientId:int}")]
+    public async Task<ActionResult<ICollection<MedicalAppointmentResource>>> GetAppointmentsByPatientIdPath(
+        int patientId)
+    {
+        try
+        {
+            var appointments = await _appointmentQueryService.HandleAsync(
+                new GetAppointmentsByPatientIdQuery(patientId));
+
+            return Ok(_resourceAssembler.ToResources(appointments));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+    
+    
 
     [HttpPut("{id}")]
     public async Task<ActionResult<MedicalAppointmentResource>> UpdateAppointment(
@@ -133,4 +152,8 @@ public class AppointmentsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+    
+    
+    
+    
 }

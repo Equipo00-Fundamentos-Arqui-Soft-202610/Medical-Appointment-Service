@@ -2,6 +2,7 @@ namespace MediTrack.MedicalAppointmentService.API.Domain.Model.Commands;
 
 public record CreateClinicalExamCommand(
     int PatientId,
+    int? AppointmentId,
     string ExamType,
-    DateTime PickupDate,
-    string? LaboratoryName);
+    DateTime? ScheduledDate,
+    DateTime? PickupDate);

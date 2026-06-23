@@ -6,16 +6,22 @@ public class ClinicalExam
 {
     public int Id { get; set; }
     public int PatientId { get; set; }
+    public int? AppointmentId { get; set; }
     public string ExamType { get; set; } = null!;
-    public DateTime PickupDate { get; set; }
-    public string? LaboratoryName { get; set; }
-    public ClinicalExamStatus Status { get; set; } = ClinicalExamStatus.PendingPickup;
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? ScheduledDate { get; set; }
+    public DateTime? PickupDate { get; set; }
+    public ClinicalExamStatus Status { get; set; } = ClinicalExamStatus.Pending;
+
+    public MedicalAppointment? Appointment { get; set; }
 
     public ClinicalExam() { }
 
-    public ClinicalExam(int patientId, string examType, DateTime pickupDate, string? laboratoryName = null)
+    public ClinicalExam(
+        int patientId,
+        string examType,
+        DateTime? scheduledDate = null,
+        DateTime? pickupDate = null,
+        int? appointmentId = null)
     {
         if (patientId <= 0)
             throw new ArgumentException("PatientId must be greater than 0", nameof(patientId));
@@ -25,18 +31,25 @@ public class ClinicalExam
 
         PatientId = patientId;
         ExamType = examType.Trim();
+        ScheduledDate = scheduledDate;
         PickupDate = pickupDate;
-        LaboratoryName = string.IsNullOrWhiteSpace(laboratoryName) ? null : laboratoryName.Trim();
-        Status = ClinicalExamStatus.PendingPickup;
-        CreatedAt = DateTime.UtcNow;
+        AppointmentId = appointmentId;
+        Status = ClinicalExamStatus.Pending;
     }
 
-    public void MarkAsPickedUp()
+    public void MarkAsReady()
     {
-        if (!Status.IsPendingPickup)
-            throw new ArgumentException("Only pending exams can be marked as picked up");
+        if (!Status.IsPending)
+            throw new ArgumentException("Only pending exams can be marked as ready");
 
-        Status = ClinicalExamStatus.PickedUp;
-        UpdatedAt = DateTime.UtcNow;
+        Status = ClinicalExamStatus.Ready;
+    }
+
+    public void MarkAsCollected()
+    {
+        if (!Status.IsReady)
+            throw new ArgumentException("Only ready exams can be marked as collected");
+
+        Status = ClinicalExamStatus.Collected;
     }
 }

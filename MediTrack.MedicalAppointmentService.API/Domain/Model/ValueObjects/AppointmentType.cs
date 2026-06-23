@@ -2,19 +2,6 @@ namespace MediTrack.MedicalAppointmentService.API.Domain.Model.ValueObjects;
 
 public class AppointmentType
 {
-    public static readonly AppointmentType General = new("general");
-    public static readonly AppointmentType Control = new("control");
-    public static readonly AppointmentType Exam = new("exam");
-    public static readonly AppointmentType Specialist = new("specialist");
-
-    private static readonly Dictionary<string, AppointmentType> ValidTypes = new()
-    {
-        { "general", General },
-        { "control", Control },
-        { "exam", Exam },
-        { "specialist", Specialist }
-    };
-
     public string Value { get; }
 
     private AppointmentType(string value)
@@ -27,11 +14,12 @@ public class AppointmentType
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException("AppointmentType cannot be empty or null", nameof(value));
 
-        var normalizedValue = value.Trim().ToLowerInvariant();
-        if (!ValidTypes.TryGetValue(normalizedValue, out var appointmentType))
-            throw new ArgumentException("AppointmentType must be general, control, exam, or specialist", nameof(value));
+        var normalizedValue = value.Trim();
 
-        return appointmentType;
+        if (normalizedValue.Length > 80)
+            throw new ArgumentException("AppointmentType cannot exceed 80 characters", nameof(value));
+
+        return new AppointmentType(normalizedValue);
     }
 
     public override bool Equals(object? obj)
