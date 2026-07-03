@@ -22,7 +22,8 @@ public class MedicalAppointment
         if (patientId <= 0)
             throw new ArgumentException("PatientId must be greater than 0", nameof(patientId));
 
-        ValidateFutureDate(scheduledAt);
+        if (scheduledAt <= DateTime.UtcNow)
+            throw new ArgumentException("La fecha de la cita debe ser posterior a ahora");
 
         PatientId = patientId;
         Type = AppointmentType.From(type);
@@ -39,7 +40,8 @@ public class MedicalAppointment
     public void Reschedule(string type, DateTime scheduledAt, string? location,string? notes)
     {
         EnsureCanBeModified();
-        ValidateFutureDate(scheduledAt);
+        if (scheduledAt <= DateTime.UtcNow)
+            throw new ArgumentException("La fecha de la cita debe ser posterior a ahora");
 
         Type = AppointmentType.From(type);
         ScheduledAt = scheduledAt;
@@ -82,9 +84,4 @@ public class MedicalAppointment
             throw new ArgumentException("Cannot modify past or non-scheduled appointments");
     }
 
-    private static void ValidateFutureDate(DateTime scheduledAt)
-    {
-        if (scheduledAt <= DateTime.UtcNow)
-            throw new ArgumentException("Appointment date must be later than the current date", nameof(scheduledAt));
-    }
 }
