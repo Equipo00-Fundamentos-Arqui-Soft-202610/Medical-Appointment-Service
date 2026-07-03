@@ -1,16 +1,25 @@
+using MediTrack.MedicalAppointmentService.API.Application.OutboundEvents;
 using MediTrack.MedicalAppointmentService.API.Domain.Model;
 using MediTrack.MedicalAppointmentService.API.Domain.Model.Aggregates;
 using MediTrack.MedicalAppointmentService.API.Domain.Model.Commands;
+using MediTrack.MedicalAppointmentService.API.Infrastructure.Messaging;
 
 namespace MediTrack.MedicalAppointmentService.API.Application.Internal.CommandServices;
 
 public class ClinicalExamCommandService : IClinicalExamCommandService
 {
     private readonly IClinicalExamRepository _clinicalExamRepository;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly ILogger<ClinicalExamCommandService> _logger;
 
-    public ClinicalExamCommandService(IClinicalExamRepository clinicalExamRepository)
+    public ClinicalExamCommandService(
+        IClinicalExamRepository clinicalExamRepository,
+        IEventPublisher eventPublisher,
+        ILogger<ClinicalExamCommandService> logger)
     {
         _clinicalExamRepository = clinicalExamRepository;
+        _eventPublisher = eventPublisher;
+        _logger = logger;
     }
 
     public async Task<ClinicalExam> HandleAsync(CreateClinicalExamCommand command)
@@ -23,6 +32,25 @@ public class ClinicalExamCommandService : IClinicalExamCommandService
             appointmentId: command.AppointmentId);
 
         await _clinicalExamRepository.AddAsync(clinicalExam);
+
+        try
+        {
+            await _eventPublisher.PublishAsync("ExamenCreado",
+                new ExamenCreadoEvent
+                {
+                    PatientId = clinicalExam.PatientId,
+                    ExamId = clinicalExam.Id,
+                    ExamType = clinicalExam.ExamType,
+                    PickupDate = clinicalExam.PickupDate
+                });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to publish ExamenCreado event for exam {ExamId}",
+                clinicalExam.Id);
+        }
+
         return clinicalExam;
     }
 
