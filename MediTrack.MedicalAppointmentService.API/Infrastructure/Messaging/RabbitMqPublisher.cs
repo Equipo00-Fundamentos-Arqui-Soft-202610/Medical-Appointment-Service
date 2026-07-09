@@ -22,11 +22,11 @@ public class RabbitMqPublisher : IEventPublisher
     public Task PublishAsync(string routingKey, object payload)
     {
         var rabbitMqSection = _configuration.GetSection("RabbitMq");
-        var exchangeName = rabbitMqSection["Exchange"] ?? DefaultExchange;
+        var exchangeName = rabbitMqSection["ExchangeName"] ?? DefaultExchange;
 
         var factory = new ConnectionFactory
         {
-            HostName = rabbitMqSection["HostName"] ?? rabbitMqSection["Host"] ?? "localhost",
+            HostName = rabbitMqSection["Host"] ?? "localhost",
             Port = rabbitMqSection.GetValue<int?>("Port") ?? AmqpTcpEndpoint.UseDefaultPort,
             UserName = rabbitMqSection["UserName"] ?? "guest",
             Password = rabbitMqSection["Password"] ?? "guest",
