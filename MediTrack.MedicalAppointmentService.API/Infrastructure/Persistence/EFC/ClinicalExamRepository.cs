@@ -23,9 +23,8 @@ public class ClinicalExamRepository : IClinicalExamRepository
 
     public async Task<ICollection<ClinicalExam>> FindPendingByPatientIdAsync(int patientId)
     {
-        var pendingStatus = ClinicalExamStatus.Pending.Value;
         return await _context.ClinicalExams
-            .Where(e => e.PatientId == patientId && e.Status.Value == pendingStatus)
+            .Where(e => e.PatientId == patientId && e.Status == ClinicalExamStatus.Pending)
             .OrderBy(e => e.PickupDate)
             .ToListAsync();
     }

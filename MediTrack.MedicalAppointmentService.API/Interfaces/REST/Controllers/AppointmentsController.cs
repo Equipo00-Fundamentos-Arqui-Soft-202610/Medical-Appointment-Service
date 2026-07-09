@@ -4,10 +4,12 @@ using MediTrack.MedicalAppointmentService.API.Domain.Model.Queries;
 using MediTrack.MedicalAppointmentService.API.Interfaces.REST.Resources;
 using MediTrack.MedicalAppointmentService.API.Interfaces.REST.Transform;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MediTrack.MedicalAppointmentService.API.Interfaces.REST.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/appointments")]
 public class AppointmentsController : ControllerBase
 {
