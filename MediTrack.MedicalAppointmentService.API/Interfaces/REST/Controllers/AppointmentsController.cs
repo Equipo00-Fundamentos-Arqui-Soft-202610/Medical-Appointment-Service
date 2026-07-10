@@ -90,7 +90,7 @@ public class AppointmentsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
-    
+
     [HttpGet("patient/{patientId:int}")]
     public async Task<ActionResult<ICollection<MedicalAppointmentResource>>> GetAppointmentsByPatientIdPath(
         int patientId)
@@ -105,10 +105,9 @@ public class AppointmentsController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
+        }
     }
-    
-    
-    
+
     [HttpGet("statistics/by-type")]
     public async Task<ActionResult<IEnumerable<AppointmentByTypeResource>>> GetAppointmentsByType()
     {
@@ -121,9 +120,7 @@ public class AppointmentsController : ControllerBase
 
         return Ok(stats);
     }
-}
 
-public record AppointmentByTypeResource(string Type, int Count);
     [HttpPut("{id}")]
     public async Task<ActionResult<MedicalAppointmentResource>> UpdateAppointment(
         int id,
@@ -154,6 +151,7 @@ public record AppointmentByTypeResource(string Type, int Count);
             return BadRequest(new { message = ex.Message });
         }
     }
+
     [HttpPost("{id}/attendance")]
     public async Task<ActionResult<MedicalAppointmentResource>> RegisterAttendance(
         int id,
@@ -169,19 +167,6 @@ public record AppointmentByTypeResource(string Type, int Count);
         {
             return BadRequest(new { message = ex.Message });
         }
-    }
-
-    [HttpGet("statistics/by-type")]
-    public async Task<ActionResult<IEnumerable<AppointmentByTypeResource>>> GetAppointmentsByType()
-    {
-        var appointments = await _appointmentRepository.FindAllAsync();
-
-        var stats = appointments
-            .GroupBy(a => a.Type.Value)
-            .Select(g => new AppointmentByTypeResource(g.Key, g.Count()))
-            .ToList();
-
-        return Ok(stats);
     }
 }
 
