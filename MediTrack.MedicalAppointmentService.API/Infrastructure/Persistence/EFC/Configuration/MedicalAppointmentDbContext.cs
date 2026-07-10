@@ -133,6 +133,13 @@ public class MedicalAppointmentDbContext : DbContext
             entity.ToTable("outbox_message");
             entity.HasKey(m => m.Id);
 
+            // Se almacena como binary(16) en lugar del char(36) implícito de Pomelo:
+            // evita la collation ascii_general_ci, rechazada por TiDB Cloud
+            // ("new collation framework"), y es más compacto/rápido para índices.
+            entity.Property(m => m.Id)
+                .HasConversion(g => g.ToByteArray(), b => new Guid(b))
+                .HasColumnType("binary(16)");
+
             entity.Property(m => m.EventType).HasMaxLength(100).IsRequired();
             entity.Property(m => m.Payload).HasColumnType("json").IsRequired();
             entity.Property(m => m.OccurredAtUtc).IsRequired();
