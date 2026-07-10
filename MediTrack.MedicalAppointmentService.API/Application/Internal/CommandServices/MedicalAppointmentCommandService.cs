@@ -81,8 +81,18 @@ public class MedicalAppointmentCommandService : IMedicalAppointmentCommandServic
         return appointment;
     }
 
+    private static readonly HashSet<string> ValidAttendanceStatuses =
+        new(StringComparer.OrdinalIgnoreCase) { "Attended", "NoShow" };
+
     public async Task<MedicalAppointment> HandleAsync(RegisterAppointmentAttendanceCommand command)
     {
+        // Sin esto, cualquier string (incluido vacío) se aceptaba y se difundía
+        // tal cual en el evento -- Medical-Analysis-Service compara este valor
+        // contra "attended" para calcular adherencia, así que un typo o un vacío
+        // rompe silenciosamente esa métrica en otro servicio.
+        if (string.IsNullOrWhiteSpace(command.Status) || !ValidAttendanceStatuses.Contains(command.Status))
+            throw new ArgumentException("Status must be 'Attended' or 'NoShow'", nameof(command.Status));
+
         var appointment = await _appointmentRepository.FindByIdAsync(command.AppointmentId);
         if (appointment == null)
             throw new ArgumentException($"Appointment with id {command.AppointmentId} not found");
