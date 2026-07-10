@@ -140,9 +140,9 @@ namespace MediTrack.MedicalAppointmentService.API.Migrations
 
             modelBuilder.Entity("MediTrack.MedicalAppointmentService.API.Infrastructure.Persistence.EFC.OutboxMessage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<byte[]>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("binary(16)");
 
                     b.Property<int>("Attempts")
                         .HasColumnType("int");
