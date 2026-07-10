@@ -15,17 +15,20 @@ public class AppointmentsController : ControllerBase
 {
     private readonly IMedicalAppointmentCommandService _appointmentCommandService;
     private readonly IMedicalAppointmentQueryService _appointmentQueryService;
+    private readonly IMedicalAppointmentRepository _appointmentRepository;
     private readonly AppointmentCommandFromResourceAssembler _commandAssembler;
     private readonly MedicalAppointmentResourceFromEntityAssembler _resourceAssembler;
 
     public AppointmentsController(
         IMedicalAppointmentCommandService appointmentCommandService,
         IMedicalAppointmentQueryService appointmentQueryService,
+        IMedicalAppointmentRepository appointmentRepository,
         AppointmentCommandFromResourceAssembler commandAssembler,
         MedicalAppointmentResourceFromEntityAssembler resourceAssembler)
     {
         _appointmentCommandService = appointmentCommandService;
         _appointmentQueryService = appointmentQueryService;
+        _appointmentRepository = appointmentRepository;
         _commandAssembler = commandAssembler;
         _resourceAssembler = resourceAssembler;
     }
@@ -102,11 +105,25 @@ public class AppointmentsController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
-        }
     }
     
     
+    
+    [HttpGet("statistics/by-type")]
+    public async Task<ActionResult<IEnumerable<AppointmentByTypeResource>>> GetAppointmentsByType()
+    {
+        var appointments = await _appointmentRepository.FindAllAsync();
 
+        var stats = appointments
+            .GroupBy(a => a.Type.Value)
+            .Select(g => new AppointmentByTypeResource(g.Key, g.Count()))
+            .ToList();
+
+        return Ok(stats);
+    }
+}
+
+public record AppointmentByTypeResource(string Type, int Count);
     [HttpPut("{id}")]
     public async Task<ActionResult<MedicalAppointmentResource>> UpdateAppointment(
         int id,

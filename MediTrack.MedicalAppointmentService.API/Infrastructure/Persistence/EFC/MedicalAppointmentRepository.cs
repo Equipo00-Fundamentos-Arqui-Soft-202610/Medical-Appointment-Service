@@ -41,4 +41,12 @@ public class MedicalAppointmentRepository : IMedicalAppointmentRepository
         _context.MedicalAppointments.Update(appointment);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<ICollection<MedicalAppointment>> FindAllAsync()
+    {
+        return await _context.MedicalAppointments
+            .Include(a => a.Requirements)
+            .OrderBy(a => a.ScheduledAt)
+            .ToListAsync();
+    }
 }
